@@ -1,0 +1,53 @@
+---
+- name: Create download directory
+  file:
+    path: "{{ local_download_dir }}"
+    state: directory
+  become: no
+  run_once: true
+  delegate_to: localhost
+
+- name: Download
+  get_url:
+    url: "{{ item }}"
+    dest: "{{ local_download_dir }}"
+  become: no
+  run_once: true
+  delegate_to: localhost
+  with_items:
+    - "{{ fd_download_url }}"
+    - "{{ plugins_download_url }}"
+
+- name: Extract
+  unarchive:
+    src: "{{ local_download_dir }}/{{ item }}.tar.gz"
+    dest: "{{ local_download_dir }}"
+  become: no
+  run_once: true
+  delegate_to: localhost
+  with_items:
+    - "fusiondirectory-{{ fusiondirectory_version }}"
+    - "fusiondirectory-plugins-{{ fusiondirectory_version }}"
+
+- name: Find schemas
+  find:
+    paths:
+      - "{{ local_fd_dir }}/contrib/openldap"
+      - "{{ local_plugins_dir }}"
+    file_type: file
+    patterns: "*.schema"
+    recurse: yes
+  become: no
+  run_once: true
+  register: functions
+  changed_when: false
+  delegate_to: localhost
+
+- name: Copy schemas
+  copy:
+    src: "{{ item.path }}"
+    dest: "{{ slapd_schema_dir }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items: "{{ functions.files }}"
