@@ -43,10 +43,18 @@
   changed_when: false
   delegate_to: localhost
 
+- name: Create schema directory
+  file:
+    path: "{{ slapd_schema_dir }}/fusiondirectory"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
 - name: Copy schemas
   copy:
     src: "{{ item.path }}"
-    dest: "{{ slapd_schema_dir }}"
+    dest: "{{ slapd_schema_dir }}/fusiondirectory"
     owner: root
     group: root
     mode: 0644
