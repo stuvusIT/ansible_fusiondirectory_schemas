@@ -1,4 +1,4 @@
 ---
 fusiondirectory_major_version: 1.0
-fusiondirectory_version: 1.1.1
+fusiondirectory_version: 1.2
 slapd_schema_dir: /etc/ldap/schema
